@@ -1,0 +1,10 @@
+version: 1
+name: minimal
+description: Power, heart rate and speed stacked in the bottom-left corner.
+units: metric
+output: { size: 1080p, fps: "30", format: prores4444 }
+style: { font: roboto-mono-bold, color: "#FFFFFF" }
+widgets:
+  - { type: metric, metric: speed,      anchor: bottom-left, offset: [0.03, 0.205], size: 0.045 }
+  - { type: metric, metric: heart_rate, anchor: bottom-left, offset: [0.03, 0.135], size: 0.045 }
+  - { type: metric, metric: power_3s,   anchor: bottom-left, offset: [0.03, 0.04],  size: 0.075 }

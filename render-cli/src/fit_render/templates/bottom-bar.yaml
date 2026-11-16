@@ -1,0 +1,13 @@
+version: 1
+name: bottom-bar
+description: A single row of metrics along the bottom edge.
+units: metric
+output: { size: 1080p, fps: "30", format: prores4444 }
+style: { font: roboto-mono-bold, color: "#FFFFFF" }
+widgets:
+  - { type: metric, metric: power_3s,        anchor: bottom-left, offset: [0.030, 0.04], size: 0.045 }
+  - { type: metric, metric: power_to_weight, anchor: bottom-left, offset: [0.190, 0.04], size: 0.045, smoothing_s: 3 }
+  - { type: metric, metric: heart_rate,      anchor: bottom-left, offset: [0.350, 0.04], size: 0.045 }
+  - { type: metric, metric: speed,           anchor: bottom-left, offset: [0.510, 0.04], size: 0.045 }
+  - { type: metric, metric: gradient,        anchor: bottom-left, offset: [0.690, 0.04], size: 0.045, smoothing_s: 5 }
+  - { type: metric, metric: elevation,       anchor: bottom-left, offset: [0.850, 0.04], size: 0.045 }
