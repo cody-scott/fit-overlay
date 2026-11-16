@@ -123,3 +123,18 @@ def test_real_ride_recording_gap_is_a_pause() -> None:
     assert timeline.value(Channel.DISTANCE, inside) == pytest.approx(20471.6)
     assert timeline.value(Channel.HEART_RATE, inside) is None
     assert timeline.moving_seconds_until(4257) == timeline.moving_seconds_until(3724)
+
+
+def test_data_logged_while_stopped_stays_on_screen() -> None:
+    """Some devices keep logging (e.g. HR) during a pause; show it, don't blank it."""
+    sp, hr = Channel.SPEED, Channel.HEART_RATE
+    activity = _activity(
+        {0: {sp: 8, hr: 120}, 1: {sp: 8, hr: 121}, 3: {hr: 118}, 5: {hr: 115}, 9: {sp: 8, hr: 110}},
+        [TimerEvent(T0 + timedelta(seconds=1), TimerEventKind.STOP),
+         TimerEvent(T0 + timedelta(seconds=9), TimerEventKind.START)],
+    )  # fmt: skip
+    timeline = TimelineBuilder(max_gap_s=0).build(activity)
+    assert timeline.value(hr, 3) == 118
+    assert timeline.value(hr, 5) == 115
+    assert timeline.value(sp, 3) == 0.0
+    assert not timeline.moving[3]
