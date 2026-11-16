@@ -10,6 +10,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from itertools import pairwise
 
 from fit_render.domain.activity import Activity, Channel, TimerEvent, TimerEventKind
 
@@ -62,11 +63,21 @@ class TimelineBuilder:
     Args:
         max_gap_s: gaps of up to this many seconds are filled with the last known
             value (normal recording jitter). Longer gaps stay empty and render as "--".
+        pause_gap_s: when consecutive records are more than this many seconds apart,
+            the seconds between them count as a pause even without timer events
+            (some apps, e.g. TrainerRoad, stop recording instead of logging a STOP).
+            Kept well above max_gap_s so smart-recording intervals are not pauses.
         moving_speed_threshold_ms: below this speed the rider counts as stopped.
     """
 
-    def __init__(self, max_gap_s: int = 2, moving_speed_threshold_ms: float = 0.5) -> None:
+    def __init__(
+        self,
+        max_gap_s: int = 2,
+        pause_gap_s: int = 10,
+        moving_speed_threshold_ms: float = 0.5,
+    ) -> None:
         self.max_gap_s = max_gap_s
+        self.pause_gap_s = pause_gap_s
         self.moving_speed_threshold_ms = moving_speed_threshold_ms
 
     def build(self, activity: Activity) -> Timeline:
@@ -81,9 +92,11 @@ class TimelineBuilder:
                     raw[channel][second] = value  # last sample in a second wins
 
         timer_running = self._timer_running(activity.timer_events, start, n)
+        paused = self._recording_paused(activity, n)
+        running = [t and not p for t, p in zip(timer_running, paused, strict=True)]
         channels = {ch: self._fill(series) for ch, series in raw.items()}
-        self._apply_stopped_values(channels, timer_running)
-        moving = self._moving(channels[Channel.SPEED], timer_running)
+        self._apply_stopped_values(channels, running)
+        moving = self._moving(channels[Channel.SPEED], running)
 
         present = activity.channels_present()
         return Timeline(
@@ -131,6 +144,17 @@ class TimelineBuilder:
                 index += 1
             running[second] = state
         return running
+
+    def _recording_paused(self, activity: Activity, n: int) -> list[bool]:
+        """Seconds inside a recording gap longer than pause_gap_s (no data at all)."""
+        paused = [False] * n
+        start = activity.start_time
+        seconds = sorted({int((r.timestamp - start).total_seconds()) for r in activity.records})
+        for before, after in pairwise(seconds):
+            if after - before > self.pause_gap_s:
+                for second in range(max(before + 1, 0), min(after, n)):
+                    paused[second] = True
+        return paused
 
     @staticmethod
     def _apply_stopped_values(

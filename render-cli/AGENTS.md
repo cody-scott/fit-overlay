@@ -43,6 +43,9 @@ API through `__init__.py`; import from there, not from internal modules.
   stamp them with the last record's time); START at its timestamp. While stopped with no
   data: speed/power/cadence = 0, distance/altitude hold, HR stays missing.
   Moving = timer running AND speed ≥ 0.5 m/s (no timer events → speed only).
+  A **recording gap** (consecutive records > `pause_gap_s` = 10 s apart) is also a stop,
+  even without timer events (TrainerRoad etc. just stop recording). Shorter gaps are not
+  (smart recording logs every few seconds) — they stay `--` past the 2 s forward-fill.
 - **Missing data** renders `--`. Gaps ≤ 2 s are forward-filled (recording jitter).
 - **Slices** are whole seconds since activity start; warn > 30 s, error > 180 s.
 - **Frame → second** uses exact `Fraction` math (`RenderPipeline.second_for_frame`) so
