@@ -655,7 +655,7 @@ gaps and risks.
 
 | # | Severity | Issue | Where | Why it matters |
 |---|---|---|---|---|
-| 1 | **High** | **CI is not committed.** `.github/workflows/render-cli.yml` was written in phase 1, but it was never pushed (it sat in a git stash because the session token lacks `workflow` scope), so there is no `.github/` directory on `main`. | repo root | Nothing enforces ruff/mypy/pytest on PRs. This is the main safety net for the "must not regress" list. (Pushing workflow files needs a token with `workflow` scope, so you may have to add it yourself.) |
+| 1 | **High** | **CI was not committed.** `.github/workflows/render-cli.yml` was written in phase 1 but never pushed (it sat in a git stash because the token then lacked `workflow` scope), so `main` had no CI. **Added in the PR that adds this document (#5).** | repo root | Nothing enforces ruff/mypy/pytest on PRs. This is the main safety net for the "must not regress" list. (Pushing workflow files needs a token with `workflow` scope, so you may have to add it yourself.) |
 | 2 | Medium | **`rich` is used but not declared.** `cli.py` imports `rich` directly. It's only installed because `typer` depends on it. | `cli.py:17-19`, `pyproject.toml` | If a future Typer release makes Rich optional (it has been discussed upstream), the CLI breaks on a fresh install or Docker build. |
 | 3 | **Medium** | **Stops show stale values for 2 s.** `_fill()` forward-fills before `_apply_stopped_values()`, so the first two seconds of every stop show the last speed/power/HR instead of 0 / `--`. | `domain/timeline.py` `build()` | It contradicts the documented rule in `AGENTS.md`. The unit test uses `max_gap_s=0`, which hides it. The visual effect is small (the rider has usually slowed already), but a brake-to-stop clip will hold its speed for 2 s. Fix: skip forward-fill on seconds where the timer isn't running (or fill only while running), and test it with the default `max_gap_s`. |
 | 4 | Medium | **The clock falls back to the host time zone.** If the FIT file has no UTC offset, `ClockMetric` uses `astimezone()`. | `metrics/derived.py:86` | The same file renders different clock values on your PC and in Docker (which is UTC). The phase-2 worker runs in Docker, so users would see UTC times. |
@@ -677,8 +677,7 @@ gaps and risks.
 1. **Commit the CI workflow** (`.github/workflows/render-cli.yml`, path-filtered, runs on push
    and PR): `uv sync --frozen`, ruff format check, ruff check, mypy, `pytest` with coverage
    (including the `@ffmpeg` tests, since the bundled binary makes them cheap), and a `docker build`
-   smoke test. Every check step passes locally (94 tests, 94 % coverage). It must be pushed
-   by someone whose token has `workflow` scope. *(Fixes #1.)*
+   smoke test. *(Done in PR #5. Fixes #1.)*
 2. **Declare `rich`** in `pyproject.toml`. *(One line. Fixes #2.)*
 3. **Move `inspect` into the pipeline** as an `ActivitySummary` dataclass + `InspectPipeline`
    (or `summarise(activity, timeline)`), so the CLI only formats it. This is also the natural
