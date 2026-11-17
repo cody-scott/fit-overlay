@@ -102,7 +102,7 @@ class OverlayPipeline:
 
     @staticmethod
     def _data_warnings(activity: Activity, overlay: Overlay, weight: float | None) -> list[str]:
-        warnings = []
+        warnings = list(activity.notes)
         missing = overlay.required_channels() - activity.channels_present()
         for channel in sorted(missing):
             warnings.append(f"No {channel.value} data in this file; those widgets will show --")

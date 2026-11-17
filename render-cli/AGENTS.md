@@ -56,6 +56,10 @@ API through `__init__.py`; import from there, not from internal modules.
   constant-frame-rate with the exact frame count.
 - **Alpha** is straight (not premultiplied); background fully transparent; anti-aliased
   edges keep the text colour. Covered by `tests/test_render.py`.
+- **Speed vs distance.** If recorded speed disagrees with distance (median ratio outside
+  0.8–1.25 over moving samples), `ingest.SpeedFromDistance` replaces speed with the
+  distance slope over ±2 s and adds an `Activity.notes` warning. TrainerRoad exports
+  speed 3.6× too small; distance and session totals are right.
 - **Fonts** must have equal-width digits (tested) so values don't jiggle.
 - Positions/sizes in specs are **fractions of the frame**, never pixels.
 
@@ -69,13 +73,16 @@ API through `__init__.py`; import from there, not from internal modules.
 - **Encoder:** subclass `VideoEncoder`/`FfmpegEncoder` (intra-only codecs: `IntraFrameEncoder`),
   add an `OutputFormat` value and an `ENCODERS` entry.
 - **Parser (GPX/TCX):** subclass `ActivityParser`, register it in `ingest/__init__.py`.
+- **Data correction:** subclass `ingest.ActivityCorrection` (detect from the data, not the
+  manufacturer), add it to `DEFAULT_CORRECTIONS`, and add a note when it fires.
 - **Template:** drop a YAML file in `templates/`; `tests/test_spec.py` builds every template.
 
 ## CLI contract (consumed by the future API worker — change deliberately)
 
 - `render ... --json` → one JSON object on stdout: `output, format, width, height, fps,
   start, end, frames, unique_frames, elapsed_s, warnings`.
-- `inspect FILE --json` → summary incl. `duration_s`, `moving_time`, `channels_coverage_pct`, `has_gps`.
+- `inspect FILE --json` → summary incl. `duration_s`, `moving_time`, `channels_coverage_pct`, `has_gps`, `notes`
+  (data-quality corrections applied; the same text appears in `render`'s `warnings`).
 - `--progress json` → NDJSON on stderr: `{"event":"start","total"}`, `{"event":"progress","done","total","percent"}`, `{"event":"finish"}`.
 - Exit codes: 0 ok, 1 `FitRenderError` (clean message on stderr, never a traceback), 2 usage.
 - All user-caused errors raise a `FitRenderError` subclass (`errors.py`).

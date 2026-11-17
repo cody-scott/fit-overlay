@@ -122,7 +122,8 @@ def test_real_ride_recording_gap_is_a_pause() -> None:
     assert timeline.value(Channel.SPEED, inside) == 0.0
     assert timeline.value(Channel.DISTANCE, inside) == pytest.approx(20471.6)
     assert timeline.value(Channel.HEART_RATE, inside) is None
-    assert timeline.moving_seconds_until(4257) == timeline.moving_seconds_until(3724)
+    # Nothing accrues inside the gap (records resume at 4257).
+    assert timeline.moving_seconds_until(4256) == timeline.moving_seconds_until(3724)
 
 
 def test_data_logged_while_stopped_stays_on_screen() -> None:
