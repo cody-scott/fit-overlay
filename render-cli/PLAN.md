@@ -55,6 +55,36 @@ Positions and sizes are always frame fractions, never pixels (existing rule).
 
 ---
 
+## M6.1 — Review fixes  (`fix/review-findings`)
+
+These come from the design review in [`ARCHITECTURE.md`](ARCHITECTURE.md) §15 (findings #2 and #3).
+They are small, so do them before M7.
+
+**Stale values at the start of a stop (#3)**
+- [ ] Bug: `TimelineBuilder.build()` runs `_fill()` before `_apply_stopped_values()`. The 2 s
+      forward-fill therefore carries the last moving values into the first two stopped seconds. On the
+      `fitgen` ride, seconds 200–201 show 28.8 km/h, 243 W and HR 139 while the timer is stopped. They
+      should show 0 / 0 / `--`.
+- [ ] Fix: don't forward-fill into seconds where the timer isn't running. One option is to pass `running`
+      into `_fill()` and reset the fill state while stopped. Distance and altitude still hold via
+      `_apply_stopped_values()`. `moving` is already correct and must not change.
+- [ ] Check the same thing for recording-gap pauses (> `pause_gap_s`). They use the same `running` mask,
+      so the fix should cover them too.
+- [ ] Tests (with the **default** `max_gap_s=2`; the current test uses 0 and hides the bug):
+      speed/power are 0 and HR is `None` at seconds 200 and 201 of the `fitgen` ride. Forward-fill still
+      works while running (HR at 300–301). Data actually logged while stopped still shows
+      (`test_data_logged_while_stopped_stays_on_screen`). The real-fixture gap test still passes.
+- [ ] Update the "Stops" rule in `AGENTS.md` if the wording needs it, and remove the ⚠️ rows/note in
+      `ARCHITECTURE.md` §7 and finding #3 in §15.
+
+**Undeclared `rich` dependency (#2)**
+- [ ] Add `rich` to `[project].dependencies` in `pyproject.toml` (`cli.py` imports it directly; today it
+      only arrives through `typer`). Run `uv lock` and commit `uv.lock`.
+- [ ] Check that `docker build` still passes. Then remove finding #2 from `ARCHITECTURE.md`.
+
+**Done when:** ruff, mypy `--strict` and pytest (including `-m ffmpeg`) all pass. The CLI JSON contract is
+unchanged.
+
 ## M7 — Graph widget foundation + elevation profile  (`feature/graph-widget`)
 
 **Plumbing**

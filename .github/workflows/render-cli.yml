@@ -1,0 +1,32 @@
+name: render-cli
+
+on:
+  push:
+    paths: ["render-cli/**", ".github/workflows/render-cli.yml"]
+  pull_request:
+    paths: ["render-cli/**", ".github/workflows/render-cli.yml"]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: render-cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: uv run mypy
+      - run: uv run pytest --cov=fit_render --cov-report=term-missing
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t fit-render render-cli
+      - run: docker run --rm fit-render --version
