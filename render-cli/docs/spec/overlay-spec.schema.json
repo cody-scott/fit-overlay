@@ -1,0 +1,414 @@
+{
+  "$defs": {
+    "Anchor": {
+      "enum": [
+        "top-left",
+        "top",
+        "top-right",
+        "left",
+        "center",
+        "right",
+        "bottom-left",
+        "bottom",
+        "bottom-right"
+      ],
+      "title": "Anchor",
+      "type": "string"
+    },
+    "LabelWidgetSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "anchor": {
+          "$ref": "#/$defs/Anchor",
+          "default": "top-left",
+          "description": "Frame point the widget is pinned to; also aligns the text."
+        },
+        "offset": {
+          "default": [
+            0.03,
+            0.03
+          ],
+          "description": "Inset from the anchor edge(s), as fractions of width/height.",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Offset",
+          "type": "array"
+        },
+        "size": {
+          "default": 0.05,
+          "description": "Font size (em) as a fraction of frame height.",
+          "exclusiveMinimum": 0.0,
+          "maximum": 0.5,
+          "title": "Size",
+          "type": "number"
+        },
+        "font": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "roboto-mono",
+                "roboto-mono-bold"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Overrides style.font for this widget."
+        },
+        "color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Overrides style.color for this widget."
+        },
+        "type": {
+          "const": "label",
+          "default": "label",
+          "title": "Type",
+          "type": "string"
+        },
+        "text": {
+          "description": "Static text to draw.",
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "LabelWidgetSpec",
+      "type": "object"
+    },
+    "MetricWidgetSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "anchor": {
+          "$ref": "#/$defs/Anchor",
+          "default": "top-left",
+          "description": "Frame point the widget is pinned to; also aligns the text."
+        },
+        "offset": {
+          "default": [
+            0.03,
+            0.03
+          ],
+          "description": "Inset from the anchor edge(s), as fractions of width/height.",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Offset",
+          "type": "array"
+        },
+        "size": {
+          "default": 0.05,
+          "description": "Font size (em) as a fraction of frame height.",
+          "exclusiveMinimum": 0.0,
+          "maximum": 0.5,
+          "title": "Size",
+          "type": "number"
+        },
+        "font": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "roboto-mono",
+                "roboto-mono-bold"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Overrides style.font for this widget."
+        },
+        "color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Overrides style.color for this widget."
+        },
+        "type": {
+          "const": "metric",
+          "default": "metric",
+          "title": "Type",
+          "type": "string"
+        },
+        "metric": {
+          "title": "Metric",
+          "type": "string",
+          "enum": [
+            "power",
+            "power_3s",
+            "power_to_weight",
+            "heart_rate",
+            "speed",
+            "cadence",
+            "elevation",
+            "distance",
+            "gradient",
+            "total_time",
+            "moving_time",
+            "clock"
+          ],
+          "description": "Metric key (see `fit-render metrics`)."
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Text before the value, e.g. 'HR'.",
+          "title": "Label"
+        },
+        "show_unit": {
+          "default": true,
+          "description": "Append the unit, e.g. 'W' or 'km/h'.",
+          "title": "Show Unit",
+          "type": "boolean"
+        },
+        "smoothing_s": {
+          "anyOf": [
+            {
+              "maximum": 60,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Trailing rolling average window in seconds.",
+          "title": "Smoothing S"
+        }
+      },
+      "required": [
+        "metric"
+      ],
+      "title": "MetricWidgetSpec",
+      "type": "object"
+    },
+    "OutputFormat": {
+      "enum": [
+        "prores4444",
+        "webm",
+        "png-seq"
+      ],
+      "title": "OutputFormat",
+      "type": "string"
+    },
+    "OutputSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "default": "1080p",
+          "description": "Frame size preset, or a custom even WIDTHxHEIGHT (e.g. '3000x2000').",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "720p",
+                "1080p",
+                "1440p",
+                "2.7k",
+                "4k",
+                "vertical-720",
+                "vertical-1080",
+                "vertical-4k",
+                "square-1080"
+              ]
+            },
+            {
+              "type": "string",
+              "pattern": "^\\d{2,5}x\\d{2,5}$"
+            }
+          ]
+        },
+        "fps": {
+          "default": "30",
+          "description": "Frame rate. Quote it in YAML ('29.97', '30').",
+          "type": "string",
+          "enum": [
+            "23.976",
+            "24",
+            "25",
+            "29.97",
+            "30",
+            "50",
+            "59.94",
+            "60"
+          ]
+        },
+        "format": {
+          "$ref": "#/$defs/OutputFormat",
+          "default": "prores4444",
+          "description": "prores4444 (.mov, every editor), webm (small, limited support), png-seq."
+        }
+      },
+      "title": "OutputSpec",
+      "type": "object"
+    },
+    "RiderSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "weight_kg": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 300,
+              "exclusiveMinimum": 20,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "For power_to_weight; falls back to the FIT profile.",
+          "title": "Weight Kg"
+        }
+      },
+      "title": "RiderSpec",
+      "type": "object"
+    },
+    "TextStyle": {
+      "additionalProperties": false,
+      "properties": {
+        "font": {
+          "type": "string",
+          "enum": [
+            "roboto-mono",
+            "roboto-mono-bold"
+          ],
+          "description": "Default font for every widget.",
+          "default": "roboto-mono-bold"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$",
+          "description": "Default text colour for every widget.",
+          "default": "#FFFFFF"
+        }
+      },
+      "title": "TextStyle",
+      "type": "object"
+    },
+    "UnitSystem": {
+      "enum": [
+        "metric",
+        "imperial"
+      ],
+      "title": "UnitSystem",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1,
+      "default": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "name": {
+      "default": "custom",
+      "description": "Short identifier; templates use the file name.",
+      "title": "Name",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "description": "One line shown by `templates list`.",
+      "title": "Description",
+      "type": "string"
+    },
+    "units": {
+      "$ref": "#/$defs/UnitSystem",
+      "default": "metric",
+      "description": "imperial switches speed, distance and elevation."
+    },
+    "rider": {
+      "$ref": "#/$defs/RiderSpec",
+      "default": {
+        "weight_kg": null
+      }
+    },
+    "output": {
+      "$ref": "#/$defs/OutputSpec",
+      "default": {
+        "size": "1080p",
+        "fps": "30",
+        "format": "prores4444"
+      }
+    },
+    "style": {
+      "$ref": "#/$defs/TextStyle",
+      "default": {
+        "font": "roboto-mono-bold",
+        "color": "#FFFFFF"
+      }
+    },
+    "widgets": {
+      "description": "Drawn in order.",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/MetricWidgetSpec"
+          },
+          {
+            "$ref": "#/$defs/LabelWidgetSpec"
+          }
+        ]
+      },
+      "minItems": 1,
+      "title": "Widgets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "widgets"
+  ],
+  "title": "OverlaySpec",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "fit-render overlay spec (version 1). Positions and sizes are fractions of the frame."
+}

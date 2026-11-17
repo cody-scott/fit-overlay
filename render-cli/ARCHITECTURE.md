@@ -108,6 +108,7 @@ src/fit_render/
   render/        Canvas (ABC) → PillowCanvas; FontLibrary; Placement; Widgets; Overlay; OverlayBuilder
   encode/        VideoEncoder (ABC) → FfmpegEncoder → IntraFrameEncoder → ProRes; WebM; PNG seq
   pipeline.py    OverlayPipeline → RenderPipeline / PreviewPipeline (the programmatic API)
+  schema.py      JSON Schema for specs (spec model + metric/font enums)
   cli.py         Typer commands (thin shell over pipeline.py)
   templates/     Built-in YAML specs (minimal, column, bottom-bar, vertical)
   assets/fonts/  Roboto Mono Regular/Bold (+ OFL licence)
@@ -404,7 +405,7 @@ classDiagram
 
 **File:** `cli.py`
 
-Typer commands: `render`, `preview`, `inspect`, `metrics`, `templates list`,
+Typer commands: `render`, `preview`, `inspect`, `metrics`, `schema`, `templates list`,
 `templates show`. Each command resolves the spec (template *or* `--spec`, then
 overrides), calls the pipeline, catches `FitRenderError` and turns it into a red one-line
 message with exit 1, and prints either human output (Rich) or JSON.
@@ -466,10 +467,11 @@ duration, moving/stopped time, record count, rider weight, GPS present, **% cove
 channel**, and correction notes. Use `--json` for machines. This is how a user (or the
 future UI) finds the time range to slice.
 
-### 6.4 `metrics` / `templates list|show`
+### 6.4 `metrics` / `schema` / `templates list|show`
 
 These are discovery commands. They list registered metric keys, fonts, sizes and frame
-rates, and list or print the built-in templates.
+rates, print the spec JSON Schema (`schema.py`), and list or print the built-in templates.
+The spec authoring guide for agents is in [`docs/spec/`](docs/spec/README.md).
 
 ### 6.5 Typical user journey
 

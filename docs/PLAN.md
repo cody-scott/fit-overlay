@@ -37,6 +37,8 @@ Take a `.fit` file, let the user choose a slice, and export a transparent video
 - [x] M4 Renderer: Canvas/Pillow, widgets, layout anchors, `preview`
 - [x] M5 Encoders + pipeline: ProRes 4444 (unique-frame fast path), WebM, PNG sequence, progress, JSON contract
 - [x] M6 Docs: READMEs, AGENTS.md files, this plan
+- [x] M6.2 Spec authoring guide for agents + JSON Schema (`render-cli/docs/spec/`, `fit-render schema`)
+- [ ] `fit-render validate` with off-frame/overlap warnings (see `render-cli/PLAN.md` M6.2)
 - [ ] Validate with real FIT files from the user's devices (`render-cli/tests/fixtures/`)
 - [ ] Verify imports in Premiere Pro and Final Cut Pro on real footage
 
