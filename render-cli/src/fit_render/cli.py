@@ -255,6 +255,7 @@ def inspect(fit_file: FitArg, as_json: JsonOpt = False) -> None:
         "rider_weight_kg": activity.rider_weight_kg,
         "has_gps": activity.has_position,
         "channels_coverage_pct": coverage,
+        "notes": list(activity.notes),
     }
     if as_json:
         print(json.dumps(summary))
@@ -263,6 +264,8 @@ def inspect(fit_file: FitArg, as_json: JsonOpt = False) -> None:
     for key, value in summary.items():
         if key == "channels_coverage_pct":
             value = ", ".join(f"{k} {v}%" for k, v in value.items()) or "none"
+        elif key == "notes":
+            value = "; ".join(value) or "none"
         table.add_row(f"[bold]{key}[/]", str(value))
     out.print(table)
 

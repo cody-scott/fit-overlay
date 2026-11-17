@@ -54,6 +54,8 @@ class Activity:
     rider_weight_kg: float | None = None
     utc_offset: timedelta | None = None  # device local time minus UTC, if known
     sport: str | None = None
+    # Data-quality notes from ingest corrections, shown to the user as warnings.
+    notes: tuple[str, ...] = ()
 
     @property
     def start_time(self) -> datetime:

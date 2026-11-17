@@ -30,6 +30,9 @@ class RideShape:
     utc_offset_h: float | None = -4.0
     with_power: bool = True
     with_timer_events: bool = True
+    # Multiplies the recorded speed field only (distance stays true), to mimic apps
+    # that export inconsistent speed (TrainerRoad: 1 / 3.6).
+    speed_scale: float = 1.0
 
 
 def power_at(second: int) -> int:
@@ -70,7 +73,7 @@ def make_ride(path: Path, shape: RideShape = RideShape()) -> Path:
         record = {
             "mesg_num": MESG["RECORD"],
             "timestamp": START + timedelta(seconds=second),
-            "speed": SPEED_MS,
+            "speed": SPEED_MS * shape.speed_scale,
             "distance": distance,
             "altitude": altitude,
             "cadence": 90,
