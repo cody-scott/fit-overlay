@@ -27,6 +27,7 @@ src/fit_render/
   render/    Canvas (ABC) → PillowCanvas; Widget → TextWidget → Metric/Label; Overlay; OverlayBuilder → metrics, spec, units
   encode/    VideoEncoder (ABC) → FfmpegEncoder → IntraFrameEncoder → ProRes; WebM; PngSequence; find_ffmpeg → spec
   pipeline.py  OverlayPipeline → RenderPipeline / PreviewPipeline (the programmatic API)
+  schema.py    JSON Schema for specs (spec model + metric/font enums) → `fit-render schema`
   cli.py       Typer shell over pipeline.py — no business logic here
   templates/*.yaml, assets/fonts/
 ```
@@ -76,6 +77,10 @@ API through `__init__.py`; import from there, not from internal modules.
 - **Data correction:** subclass `ingest.ActivityCorrection` (detect from the data, not the
   manufacturer), add it to `DEFAULT_CORRECTIONS`, and add a note when it fires.
 - **Template:** drop a YAML file in `templates/`; `tests/test_spec.py` builds every template.
+  Writing one (or a user spec)? Read [`docs/spec/`](docs/spec/README.md) first: workflow,
+  field reference, layout maths and tested examples.
+- **Spec schema change:** update `docs/spec/` and regenerate the JSON Schema
+  (`uv run fit-render schema > docs/spec/overlay-spec.schema.json`); `tests/test_spec_docs.py` checks it.
 
 ## CLI contract (consumed by the future API worker — change deliberately)
 
@@ -83,6 +88,7 @@ API through `__init__.py`; import from there, not from internal modules.
   start, end, frames, unique_frames, elapsed_s, warnings`.
 - `inspect FILE --json` → summary incl. `duration_s`, `moving_time`, `channels_coverage_pct`, `has_gps`, `notes`
   (data-quality corrections applied; the same text appears in `render`'s `warnings`).
+- `schema` → JSON Schema for overlay specs on stdout (same as `docs/spec/overlay-spec.schema.json`).
 - `--progress json` → NDJSON on stderr: `{"event":"start","total"}`, `{"event":"progress","done","total","percent"}`, `{"event":"finish"}`.
 - Exit codes: 0 ok, 1 `FitRenderError` (clean message on stderr, never a traceback), 2 usage.
 - All user-caused errors raise a `FitRenderError` subclass (`errors.py`).

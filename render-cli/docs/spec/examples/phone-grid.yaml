@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=../overlay-spec.schema.json
+# 9:16 two-column grid in the lower third. On vertical frames a character is ~1.07 x size
+# of the frame WIDTH, so keep sizes small and labels short. Bottom 0.15 is left clear for
+# phone-app UI (captions, buttons).
+version: 1
+name: phone-grid
+description: 9:16 two-column grid, values above small captions.
+units: metric
+output: { size: vertical-1080, fps: "30", format: prores4444 }
+style: { font: roboto-mono-bold, color: "#FFFFFF" }
+widgets:
+  # left column: caption above value
+  - { type: label, text: POWER, anchor: bottom-left, offset: [0.06, 0.285], size: 0.016, color: "#FFFFFFB3" }
+  - { metric: power_3s,         anchor: bottom-left, offset: [0.06, 0.230], size: 0.038 }
+  - { type: label, text: SPEED, anchor: bottom-left, offset: [0.06, 0.205], size: 0.016, color: "#FFFFFFB3" }
+  - { metric: speed,            anchor: bottom-left, offset: [0.06, 0.150], size: 0.038 }
+  # right column: right-aligned
+  - { type: label, text: HR,    anchor: bottom-right, offset: [0.06, 0.285], size: 0.016, color: "#FFFFFFB3" }
+  - { metric: heart_rate,       anchor: bottom-right, offset: [0.06, 0.230], size: 0.038 }
+  - { type: label, text: GRADE, anchor: bottom-right, offset: [0.06, 0.205], size: 0.016, color: "#FFFFFFB3" }
+  - { metric: gradient,         anchor: bottom-right, offset: [0.06, 0.150], size: 0.038, smoothing_s: 5 }

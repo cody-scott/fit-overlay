@@ -85,6 +85,33 @@ They are small, so do them before M7.
 **Done when:** ruff, mypy `--strict` and pytest (including `-m ffmpeg`) all pass. The CLI JSON contract is
 unchanged.
 
+## M6.2 — Spec authoring docs for agents  (`docs/spec-authoring-guide`)
+
+Goal: an agent (or a person) can write a correct, good-looking overlay spec or built-in template
+from the docs alone, without reading the source. Everything lives in [`docs/spec/`](docs/spec/).
+
+- [x] `docs/spec/README.md`: agent workflow (brief → check channels → start from a template →
+      lay out → validate → preview → render), common mistakes, how to add a built-in template.
+- [x] `docs/spec/reference.md`: every field, value, default and validation rule; the metric
+      catalogue with units, needed channels and worst-case text widths; real error messages.
+- [x] `docs/spec/layout.md`: anchor/offset maths, Roboto Mono metrics (line box 1.32 em,
+      advance 0.6 em), width formula per aspect ratio, stacking and side-by-side rules, size and
+      margin rules of thumb.
+- [x] `docs/spec/examples/`: `corner-stack`, `race-hud`, `phone-grid` (each previewed on the
+      `fitgen` ride).
+- [x] JSON Schema: `fit_render/schema.py` adds metric/font/fps/size enums to the Pydantic
+      schema; new `fit-render schema` command; committed as `docs/spec/overlay-spec.schema.json`
+      (examples reference it for `yaml-language-server`). Field descriptions added to the models.
+- [x] `tests/test_spec_docs.py`: the schema file is current, every metric is in the reference
+      table, every example builds.
+- [ ] `fit-render validate SPEC` (no FIT file needed): schema + metric/font checks, plus warnings
+      for widgets that run off the frame or overlap, using worst-case text widths. Agents would
+      get layout feedback without rendering a preview.
+- [ ] Optional: a Claude Code skill (`.claude/skills/overlay-spec/`) that points at these docs and
+      runs the validate → preview loop.
+- [ ] M7–M10 each update `docs/spec/` (new widget fields, style options, examples) and regenerate
+      the schema. Added to the cross-cutting list below.
+
 ## M7 — Graph widget foundation + elevation profile  (`feature/graph-widget`)
 
 **Plumbing**
@@ -157,6 +184,8 @@ unchanged.
 
 - `ruff format`, `ruff check`, `mypy --strict`, `pytest` all pass.
 - README + `render-cli/AGENTS.md` "Extending" / "must not regress" sections updated.
+- Spec changes: `docs/spec/` reference/layout/examples updated and the schema regenerated
+  (`uv run fit-render schema > docs/spec/overlay-spec.schema.json`; `test_spec_docs.py` checks it).
 - The CLI JSON contract is unchanged. A new widget type is additive. Consider listing widget types in `--help`.
 - Layering: the new code respects `domain`/`units` → `metrics` → `spec` → `render`. Nothing imports `cli`.
 

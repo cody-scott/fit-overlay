@@ -32,6 +32,14 @@ def test_templates_show_roundtrip(tmp_path: Path, ride_path: Path) -> None:
     assert out.is_file()
 
 
+def test_schema_prints_json_schema() -> None:
+    result = runner.invoke(app, ["schema"])
+    assert result.exit_code == 0, result.output
+    schema = json.loads(result.stdout)
+    assert schema["title"] == "OverlaySpec"
+    assert "power_3s" in schema["$defs"]["MetricWidgetSpec"]["properties"]["metric"]["enum"]
+
+
 def test_render_png_sequence_json(ride_path: Path, tmp_path: Path) -> None:
     out = tmp_path / "frames"
     result = runner.invoke(

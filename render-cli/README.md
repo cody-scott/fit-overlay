@@ -25,6 +25,7 @@ docker run --rm -v "$PWD:/work" fit-render render ride.fit --start 12:30 --end 1
 fit-render inspect ride.fit                       # duration, data present, stops
 fit-render templates list                         # built-in layouts
 fit-render metrics                                # metric keys, fonts, sizes, fps
+fit-render schema                                 # overlay spec JSON Schema
 
 # Check a layout on one frame (PNG), then render the slice
 fit-render preview ride.fit -t column --at 12:45 -o frame.png
@@ -76,6 +77,9 @@ widgets:
 
 Metrics: `power power_3s power_to_weight heart_rate speed cadence elevation distance
 gradient total_time moving_time clock`. Missing data renders as `--`.
+
+Full field reference, layout maths and tested examples (written for agents, useful for
+people): [`docs/spec/`](docs/spec/README.md).
 
 ## Machine interface (for the API worker)
 
