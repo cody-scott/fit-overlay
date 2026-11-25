@@ -80,9 +80,12 @@ def parse_frame_size(value: str) -> tuple[int, int]:
 
 
 class OutputSpec(_Model):
-    size: str = "1080p"
-    fps: str = "30"
-    format: OutputFormat = OutputFormat.PRORES_4444
+    size: str = Field("1080p", description="Frame size preset or WIDTHxHEIGHT.")
+    fps: str = Field("30", description="Frame rate.")
+    format: OutputFormat = Field(
+        OutputFormat.PRORES_4444,
+        description="prores4444 (.mov, every editor), webm (small, limited support), png-seq.",
+    )
 
     @field_validator("size")
     @classmethod
@@ -120,11 +123,15 @@ class TextStyle(_Model):
 
 
 class _WidgetSpec(_Model):
-    anchor: Anchor = Anchor.TOP_LEFT
+    anchor: Anchor = Field(
+        Anchor.TOP_LEFT, description="Frame point the widget is pinned to; also aligns the text."
+    )
     offset: tuple[float, float] = Field(
         (0.03, 0.03), description="Inset from the anchor edge(s), as fractions of width/height."
     )
-    size: float = Field(0.05, gt=0.0, le=0.5, description="Text height as a fraction of height.")
+    size: float = Field(
+        0.05, gt=0.0, le=0.5, description="Font size (em) as a fraction of frame height."
+    )
     font: str | None = None  # overrides the spec-level style
     color: str | None = None
 
@@ -145,13 +152,15 @@ class MetricWidgetSpec(_WidgetSpec):
     type: Literal["metric"] = "metric"
     metric: str
     label: str | None = Field(None, description="Text before the value, e.g. 'HR'.")
-    show_unit: bool = True
-    smoothing_s: int | None = Field(None, ge=1, le=60, description="Rolling average window.")
+    show_unit: bool = Field(True, description="Append the unit, e.g. 'W' or 'km/h'.")
+    smoothing_s: int | None = Field(
+        None, ge=1, le=60, description="Trailing rolling average window in seconds."
+    )
 
 
 class LabelWidgetSpec(_WidgetSpec):
     type: Literal["label"] = "label"
-    text: str = Field(min_length=1)
+    text: str = Field(min_length=1, description="Static text to draw.")
 
 
 def _widget_type(value: object) -> str:
@@ -168,15 +177,19 @@ WidgetSpec = Annotated[
 
 
 class RiderSpec(_Model):
-    weight_kg: float | None = Field(None, gt=20, lt=300)
+    weight_kg: float | None = Field(
+        None, gt=20, lt=300, description="For power_to_weight; falls back to the FIT profile."
+    )
 
 
 class OverlaySpec(_Model):
     version: Literal[1] = 1
-    name: str = "custom"
-    description: str = ""
-    units: UnitSystem = UnitSystem.METRIC
+    name: str = Field("custom", description="Short identifier; templates use the file name.")
+    description: str = Field("", description="One line shown by `templates list`.")
+    units: UnitSystem = Field(
+        UnitSystem.METRIC, description="imperial switches speed, distance and elevation."
+    )
     rider: RiderSpec = RiderSpec()
     output: OutputSpec = OutputSpec()
     style: TextStyle = TextStyle()
-    widgets: list[WidgetSpec] = Field(min_length=1)
+    widgets: list[WidgetSpec] = Field(min_length=1, description="Drawn in order.")

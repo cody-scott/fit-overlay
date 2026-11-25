@@ -27,6 +27,7 @@ from fit_render.ingest import load_activity
 from fit_render.metrics import default_registry
 from fit_render.pipeline import NullProgress, PreviewPipeline, ProgressListener, RenderPipeline
 from fit_render.render import FontLibrary
+from fit_render.schema import overlay_spec_schema_json
 from fit_render.spec import (
     FRAME_RATES,
     FRAME_SIZES,
@@ -279,6 +280,12 @@ def metrics() -> None:
     out.print(table)
     out.print(f"Fonts: {', '.join(FontLibrary().names())}")
     out.print(f"Sizes: {', '.join(FRAME_SIZES)}  |  FPS: {', '.join(FRAME_RATES)}")
+
+
+@app.command()
+def schema() -> None:
+    """Print the overlay spec JSON Schema (for editors and agents writing specs)."""
+    print(overlay_spec_schema_json(), end="")
 
 
 @templates_app.command("list")

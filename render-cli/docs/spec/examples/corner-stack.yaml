@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=../overlay-spec.schema.json
+# Labelled metrics stacked in the bottom-left corner, biggest value at the bottom.
+# Rows are stacked bottom-up: each offset_y = previous offset_y + 1.32 x previous size + gap.
+version: 1
+name: corner-stack
+description: Power, W/kg, HR and cadence stacked bottom-left with labels.
+units: metric
+rider: { weight_kg: 72 }
+output: { size: 1080p, fps: "30", format: prores4444 }
+style: { font: roboto-mono-bold, color: "#FFFFFF" }
+widgets:
+  - { metric: cadence,         label: CAD,  anchor: bottom-left, offset: [0.03, 0.270], size: 0.035 }
+  - { metric: heart_rate,      label: HR,   anchor: bottom-left, offset: [0.03, 0.215], size: 0.035 }
+  - { metric: power_to_weight, label: W/KG, anchor: bottom-left, offset: [0.03, 0.160], size: 0.035, show_unit: false, smoothing_s: 3 }
+  - { metric: power_3s,                     anchor: bottom-left, offset: [0.03, 0.040], size: 0.080 }

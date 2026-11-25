@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=../overlay-spec.schema.json
+# 4K, imperial, two corner groups + a static title. Shows per-widget colour/font overrides
+# and a semi-transparent colour (#RRGGBBAA).
+version: 1
+name: race-hud
+description: 4K imperial HUD with a title, clock and two corner groups.
+units: imperial
+output: { size: 4k, fps: "59.94", format: prores4444 }
+style: { font: roboto-mono-bold, color: "#FFFFFF" }
+widgets:
+  - { type: label, text: "STAGE 3 - FINAL CLIMB", anchor: top, offset: [0.0, 0.04], size: 0.035 }
+  - { metric: clock, anchor: top-right, offset: [0.03, 0.04], size: 0.030, font: roboto-mono, color: "#FFFFFFB3" }
+  # top-left: where you are
+  - { metric: distance,  label: DIST, anchor: top-left, offset: [0.03, 0.040], size: 0.030 }
+  - { metric: elevation, label: ELEV, anchor: top-left, offset: [0.03, 0.085], size: 0.030 }
+  - { metric: gradient,  label: GRADE, anchor: top-left, offset: [0.03, 0.130], size: 0.030, smoothing_s: 5, color: "#FFD54F" }
+  # bottom-right: effort, right-aligned so the values line up on the right edge
+  - { metric: heart_rate, anchor: bottom-right, offset: [0.03, 0.125], size: 0.040 }
+  - { metric: power_3s,   anchor: bottom-right, offset: [0.03, 0.040], size: 0.060 }
